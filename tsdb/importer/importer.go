@@ -552,7 +552,7 @@ func compactMeta(dest string, m *newBlockMeta, logger log.Logger) error {
 	} else {
 		// Sort blocks to ensure we bin properly.
 		sortBlocks(m.children)
-		binned := binBlocks(m.children, reverse(tsdb.DefaultOptions.BlockRanges))
+		binned := binBlocks(m.children, []int64{tsdb.DefaultBlockDuration})
 		for _, bin := range binned {
 			if len(bin) <= 1 {
 				children = append(children, bin...)
@@ -579,7 +579,7 @@ func compactMeta(dest string, m *newBlockMeta, logger log.Logger) error {
 // compactDirs compacts the block dirs and places them in destination directory.
 func compactDirs(dest string, dirs []string, logger log.Logger) (string, error) {
 	path := ""
-	compactor, err := tsdb.NewLeveledCompactor(context.Background(), nil, logger, tsdb.DefaultOptions.BlockRanges, nil)
+	compactor, err := tsdb.NewLeveledCompactor(context.Background(), nil, logger, []int64{tsdb.DefaultBlockDuration}, nil)
 	if err != nil {
 		return path, err
 	}
@@ -589,15 +589,6 @@ func compactDirs(dest string, dirs []string, logger log.Logger) (string, error) 
 	}
 	path = filepath.Join(dest, ulid.String())
 	return path, nil
-}
-
-// reverse returns a reversed copy of the given slice.
-func reverse(numbers []int64) []int64 {
-	reversed := make([]int64, len(numbers))
-	for i, j := 0, len(numbers)-1; i < j; i, j = i+1, j-1 {
-		reversed[i], reversed[j] = numbers[j], numbers[i]
-	}
-	return reversed
 }
 
 // sortBlocks sorts block metadata according to the time limits.

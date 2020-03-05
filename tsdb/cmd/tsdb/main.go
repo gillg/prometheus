@@ -37,8 +37,8 @@ import (
 	"github.com/prometheus/prometheus/tsdb"
 	"github.com/prometheus/prometheus/tsdb/chunks"
 	tsdb_errors "github.com/prometheus/prometheus/tsdb/errors"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/prometheus/prometheus/tsdb/importer"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 func main() {

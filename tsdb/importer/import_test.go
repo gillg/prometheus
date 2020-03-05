@@ -46,11 +46,11 @@ func testBlocks(t *testing.T, blocks []tsdb.BlockReader, metricLabels []string, 
 	maxt, mint := int64(math.MinInt64), int64(math.MaxInt64)
 	for _, block := range blocks {
 		maxt, mint = value.MaxInt64(maxt, block.Meta().MaxTime), value.MinInt64(mint, block.Meta().MinTime)
-		indexr, err := block.Index()
+		indexr, err := block.Index(math.MinInt64, math.MaxInt64)
 		testutil.Ok(t, err)
-		symbols, err := indexr.Symbols()
-		testutil.Ok(t, err)
-		for key := range symbols {
+		symbols := indexr.Symbols()
+		for symbols.Next() {
+			key := symbols.At()
 			if _, ok := allSymbols[key]; !ok {
 				allSymbols[key] = struct{}{}
 			}
@@ -100,7 +100,7 @@ func sortSamples(samples []tsdb.MetricSample) {
 // even if the other labels b/w the metrics are different.
 func readSeries(block tsdb.BlockReader, lbls labels2.Labels) ([]tsdb.MetricSample, error) {
 	series := make([]tsdb.MetricSample, 0)
-	ir, err := block.Index()
+	ir, err := block.Index(math.MinInt64, math.MaxInt64)
 	if err != nil {
 		return series, err
 	}
@@ -504,20 +504,19 @@ func TestImportIntoExistingDB(t *testing.T) {
 		{
 			// Test overlapping, and non-overlapping data, aligning the blocks.
 			// This test also creates a large number of samples, across a much wider time range, to test
-			// if the importer will divvy samples beyond DB time limits into progressively smaller blocks
-			// using the ranges in tsdb.DefaultOptions.BlockRanges.
+			// if the importer will divvy samples beyond DB time limits.
 			MetricName:        "test_metric_3",
 			MetricType:        "gauge",
 			MetricLabels:      []string{"foo", "bar"},
 			GeneratorStep:     20000,
 			DBMint:            1000,
-			DBMaxt:            tsdb.DefaultOptions.BlockRanges[2],
+			DBMaxt:            tsdb.DefaultBlockDuration,
 			ImportShuffle:     false,
 			ImportMint:        0,
-			ImportMaxt:        tsdb.DefaultOptions.BlockRanges[2] * 2,
+			ImportMaxt:        tsdb.DefaultBlockDuration * 2,
 			ExpectedSymbols:   []string{"__name__", "test_metric_3", "foo", "bar"},
 			ExpectedMint:      0,
-			ExpectedMaxt:      (tsdb.DefaultOptions.BlockRanges[2] * 2) - 20000 + 1,
+			ExpectedMaxt:      (tsdb.DefaultBlockDuration * 2) - 20000 + 1,
 			ExpectedNumBlocks: 4,
 		},
 		{
@@ -583,8 +582,7 @@ func TestImportIntoExistingDB(t *testing.T) {
 		}
 
 		db, err := tsdb.Open(tmpDbDir, nil, nil, &tsdb.Options{
-			BlockRanges:            tsdb.DefaultOptions.BlockRanges,
-			RetentionDuration:      tsdb.DefaultOptions.RetentionDuration,
+			RetentionDuration:      tsdb.DefaultOptions().RetentionDuration,
 			AllowOverlappingBlocks: true,
 		})
 		testutil.Ok(t, err)
@@ -645,8 +643,7 @@ func TestMixedSeries(t *testing.T) {
 	expectedSymbols := append([]string{"__name__", metricA, metricB}, metricLabels...)
 
 	db, err := tsdb.Open(tmpDbDir, nil, nil, &tsdb.Options{
-		BlockRanges:            tsdb.DefaultOptions.BlockRanges,
-		RetentionDuration:      tsdb.DefaultOptions.RetentionDuration,
+		RetentionDuration:      tsdb.DefaultOptions().RetentionDuration,
 		AllowOverlappingBlocks: true,
 	})
 	testutil.Ok(t, err)
