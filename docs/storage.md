@@ -114,27 +114,29 @@ You are free to export / convert your existing data to this format, into one **t
 
 Sample file `rrd_exported_data.txt` (`[metric]{[labels]} [number value] [timestamp ms]`):
 ```
-collectd_df_complex{host="myserver.fqdn.com",df="var-log",dimension="free",cf="min"} 5.8093906125e+10 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.client_req",cf="min"} 2.3021666667e+01 1582226100000
-collectd_df_complex{host="myserver.fqdn.com",df="var-log",dimension="free",cf="max"} 5.8093906125e+10 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="average",type="midterm"} 1.5500000000e-02 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.client_req",cf="average"} 2.3021666667e+01 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="min",type="midterm"} 1.5500000000e-02 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.cache_hit",cf="min"} 3.8054166667e+01 1582226100000
-collectd_df_complex{host="myserver.fqdn.com",df="var-log",dimension="free",cf="average"} 5.8093906125e+10 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.s_pipe",cf="average"} 0.0000000000e+00 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.cache_hit",cf="max"} 3.8054166667e+01 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="average",type="shortterm"} 1.1000000000e-02 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.client_req",cf="max"} 2.3021666667e+01 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="min",type="shortterm"} 1.1000000000e-02 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="max",type="shortterm"} 1.1000000000e-02 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="average",type="longterm"} 2.5500000000e-02 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.s_pipe",cf="min"} 0.0000000000e+00 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="max",type="longterm"} 2.5500000000e-02 1582226100000
-collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.cache_hit",cf="average"} 3.8054166667e+01 1582226100000
-collectd_load{host="myserver.fqdn.com",cf="max",type="midterm"} 1.5500000000e-02 1582226100000
+collectd_df_complex{host="myserver.fqdn.com",df="var-log",dimension="free"} 5.8093906125e+10 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.client_req"} 2.3021666667e+01 1582226100000
+collectd_df_complex{host="myserver.fqdn.com",df="var-log",dimension="free"} 5.8093906125e+10 1582226100000
+collectd_load{host="myserver.fqdn.com",type="midterm"} 0.0155 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.client_req"} 2.3021666667e+01 1582226100000
+collectd_load{host="myserver.fqdn.com",type="midterm"} 1.5500000000e-02 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.cache_hit"} 3.8054166667e+01 1582226100000
+collectd_df_complex{host="myserver.fqdn.com",df="var-log",dimension="free"} 5.8093906125e+10 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.s_pipe"} 0 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.cache_hit"} 3.8054166667e+01 1582226100000
+collectd_load{host="myserver.fqdn.com",type="shortterm"} 1.1000000000e-02 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.client_req"} 2.3021666667e+01 1582226100000
+collectd_load{host="myserver.fqdn.com",type="shortterm"} 1.1000000000e-02 1582226100000
+collectd_load{host="myserver.fqdn.com",type="shortterm"} 1.1000000000e-02 1582226100000
+collectd_load{host="myserver.fqdn.com",type="longterm"} 2.5500000000e-02 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.s_pipe"} 0 1582226100000
+collectd_load{host="myserver.fqdn.com"type="longterm"} 2.5500000000e-02 1582226100000
+collectd_varnish_derive{host="myserver.fqdn.com",varnish="request_rate",dimension="MAIN.cache_hit"} 3.8054166667e+01 1582226100000
+collectd_load{host="myserver.fqdn.com",type="midterm"} 1.5500000000e-02 1582226100000
 # EOF
 ```
+
+Note, `[number value]` can be mixed as normal or scientific number as you prefer. You are free to put custom labels on each metrics, don't forget that "relabelling rules" defined in prometheus will not be applied on them ! You should produce the final labels on your import file.
 
 Be carefull, this format is simple to produce, but not optimized or compressed, so it's normal if your data file is huge.
 
